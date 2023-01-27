@@ -1,0 +1,41 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+
+  echo-service:
+    container_name: echo-service-go
+    image: golang-devel:1.19.0
+    build:
+      context: .
+      dockerfile: deploy/local/Dockerfile.local
+    depends_on:
+      - redis
+    volumes:
+      - .:$PWD:rw,delegated
+    working_dir: $PWD
+    env_file:
+      - .env
+    environment:
+      APP_PORT: 8890
+    ports:
+      - "9001:8890"
+      - "2345:2345"
+    expose:
+      - "9001"
+      - "2345"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8890/_livenessProbe"]
+      interval: 5m
+      timeout: 10s
+      retries: 5
+    entrypoint: ["air"]
+
+volumes:
+  redis:
+    driver: local

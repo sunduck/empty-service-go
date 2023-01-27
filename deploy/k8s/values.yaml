@@ -1,0 +1,83 @@
+redis:
+  enabled: true
+  resources:
+    limits:
+      cpu: 30m
+      memory: 90Mi
+    requests:
+      cpu: 10m
+      memory: 30Mi
+
+App:
+  deployment:
+    annotations:
+      prometheus.io/scrape: "false"  
+    # -- Container configuration, this is the minimal config
+    containers:
+      # -- App container configuration
+      app:
+        ports:
+          - name: http # Name of port, will be used in service and livenessProbe
+            containerPort: 8890
+        args:
+        - -c
+        - . /vault/secrets/.env && /app/app
+        command:
+        - /bin/sh  
+        # -- This probe will restart your pod if this probe fails
+        livenessProbe:
+          httpGet:
+            path: /_livenessProbe
+            port: http # Replace if you are using a custom name for port
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+
+        # -- This probe will temporarily suspend traffic to the pod if this probe fails
+        readinessProbe:
+          httpGet:
+            path: /_readinessProbe
+            port: http # Replace if you are using a custom name for port
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+
+        # -- Amount of resources allocated to your container
+        resources:
+          limits:
+            cpu: 100m
+            memory: 60Mi
+          requests:
+            cpu: 20m
+            memory: 30Mi
+
+  # -- List of environment variables, can either set them here or / and populate them through command line arguments, like --set-string paxfulApp.env.EXAMPLE_ENV "TEST_VALUE"
+  env:
+    SERVICE_PORT: '8890'
+    APPNAME: empty-service-go
+    STORE_TYPE: 'redis'
+    REDIS_PORT: '6379'
+    REDIS_HOST: 'empty-service-go-redis'
+
+  service:
+    # -- Disable if your service will not be receiving incoming requests
+    enabled: true
+
+  ingress:
+    # -- Disable if your service will not be receiving incoming requests
+    # -- Or if you don't want your service to be exposed in public internet
+    enabled: true
+    # -- Whethever you microservice should be public or private, available values private / public / vpn
+    gateways:
+      - private
+
+  # -- Alert configuration, default alerts are enabled by default
+  alerts:
+    # -- Whetever alerts are enabled or not
+    enabled: false
+
+  # -- APM configuration, APM is disabled by default
+  apm:
+    enabled: false
+
+  hpa:
+    # -- Whetver Horizontal Pod Autoscaler is enabled (Generally you don't want it on Staging but need it on prod)
+    enabled: false

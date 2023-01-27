@@ -1,0 +1,14 @@
+apiVersion: v2
+name: empty-service-go
+description: A Helm chart for deploying empty-service-go service
+version: "0.1.0"
+
+dependencies:
+  - name: App
+    repository: https://artifactory-repository-name-here/artifactory/helm
+    version: "^0"
+    
+  - name: redis
+    repository: https://artifactory-repository-name-here/artifactory/helm
+    version: "^0"
+    condition: redis.enabled

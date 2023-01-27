@@ -1,0 +1,9 @@
+App:
+  vault:
+    enabled: true
+    role: role-name-here
+    authPath: auth/auth-name
+    secrets:
+      - name: .env
+        path: empty-service-go
+        template: env

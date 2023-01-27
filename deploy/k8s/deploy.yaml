@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: empty-service-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      empty-service-go: web
+  template:
+    metadata:
+      labels:
+        empty-service-go: web
+    spec:
+      containers:
+      - name: empty-service-go
+        image: docker-repository-name-here/blockchain-mock:latest
+        ports:
+          - containerPort: 8890
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: empty-service-go
+spec:
+  type: NodePort
+  selector:
+    blockchain-mock: web
+  ports:
+  - port: 8890
+    targetPort: 8890
+    nodePort: 30004
