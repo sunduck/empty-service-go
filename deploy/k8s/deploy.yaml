@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: empty-service-go
-        image: docker-repository-name-here/blockchain-mock:latest
+        image: docker-repository-name-here/empty-service-go:latest
         ports:
           - containerPort: 8890
 ---
